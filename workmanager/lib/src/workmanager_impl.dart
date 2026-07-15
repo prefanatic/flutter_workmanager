@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:workmanager_platform_interface/workmanager_platform_interface.dart';
 import 'package:workmanager_android/workmanager_android.dart';
 import 'package:workmanager_apple/workmanager_apple.dart';
@@ -114,6 +115,9 @@ class Workmanager {
 
   /// Platform implementation
   static WorkmanagerPlatform get _platform => WorkmanagerPlatform.instance;
+  static const _foregroundChannel = MethodChannel(
+    'dev.fluttercommunity.workmanager/foreground',
+  );
 
   /// Initialize the Workmanager with a [callbackDispatcher].
   ///
@@ -291,12 +295,66 @@ class Workmanager {
   /// Cancels all tasks
   Future<void> cancelAll() async => _platform.cancelAll();
 
+  /// Promotes the currently executing Android worker to a long-running
+  /// foreground worker. Calling this again updates the same notification.
+  Future<void> setForeground(WorkmanagerForegroundOptions options) async {
+    if (!Platform.isAndroid) return;
+    await _foregroundChannel.invokeMethod<void>(
+      'setForeground',
+      options.toMap(),
+    );
+  }
+
   /// Prints details of un-executed scheduled tasks to console. To be used during
   /// development/debugging.
   ///
   /// Currently only supported on iOS and only on iOS 13+.
   /// Returns a string containing the scheduled tasks information.
   Future<String> printScheduledTasks() async => _platform.printScheduledTasks();
+}
+
+class WorkmanagerForegroundOptions {
+  const WorkmanagerForegroundOptions({
+    required this.notificationId,
+    required this.channelId,
+    required this.channelName,
+    required this.channelDescription,
+    required this.title,
+    required this.description,
+    required this.foregroundServiceType,
+    this.progress,
+    this.smallIconResourceName,
+    this.cancelLabel,
+  });
+
+  final int notificationId;
+  final String channelId;
+  final String channelName;
+  final String channelDescription;
+  final String title;
+  final String description;
+  final int foregroundServiceType;
+  final int? progress;
+  final String? smallIconResourceName;
+  final String? cancelLabel;
+
+  Map<String, Object?> toMap() => {
+        'notificationId': notificationId,
+        'channelId': channelId,
+        'channelName': channelName,
+        'channelDescription': channelDescription,
+        'title': title,
+        'description': description,
+        'foregroundServiceType': foregroundServiceType,
+        'progress': progress,
+        'smallIconResourceName': smallIconResourceName,
+        'cancelLabel': cancelLabel,
+      };
+}
+
+abstract final class ForegroundServiceType {
+  static const dataSync = 1 << 0;
+  static const connectedDevice = 1 << 4;
 }
 
 /// Converts inputData from Pigeon format, filtering out null keys
