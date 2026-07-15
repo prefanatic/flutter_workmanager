@@ -1,3 +1,83 @@
+## 0.9.0+3
+
+ - Update a dependency to the latest release.
+
+## 0.9.0+2
+
+ - Update a dependency to the latest release.
+
+## 0.9.0+1
+
+ - Update a dependency to the latest release.
+
+## 0.9.0
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: replace debug mode with extensible hook-based system (#630).
+ - **REFACTOR**: Migrate internal interfaces to pigeon (#613).
+ - **FIX**: resolve critical null handling crashes from contributor reports (#626).
+ - **FEAT**: Migrate to federated plugin architecture (#611).
+ - **BREAKING** **FIX**: resolve issue #622 - periodic tasks running at incorrect frequencies (#628).
+
+
+# 0.8.0
+
+## Major Architecture Changes
+* **BREAKING**: Migrate to federated plugin architecture for better platform extensibility
+* **BREAKING**: Platform-specific implementations moved to separate packages
+* Create `workmanager_platform_interface` for shared platform interface
+* Create `workmanager_android` package with Android WorkManager implementation
+* Create `workmanager_apple` package with iOS BGTaskScheduler implementation
+* Foundation for future macOS support using NSBackgroundActivityScheduler
+
+## Breaking Changes
+* **BREAKING**: Enum values changed from snake_case to camelCase:
+  * `NetworkType` values: `not_required` → `notRequired`, `not_roaming` → `notRoaming`, `metered` → `metered` (unchanged)
+  * `OutOfQuotaPolicy` values: `run_as_non_expedited_work_request` → `runAsNonExpeditedWorkRequest`, `drop_work_request` → `dropWorkRequest`
+* **BREAKING**: Removed JSON serialization for inputData - now uses native Map transfer for better performance and type safety
+
+## New Features
+* Android: Added `isScheduledByUniqueName` method to check if a periodic task is scheduled by its unique name (Android only)
+* Added comprehensive integration tests for better reliability
+
+## Bug Fixes
+* iOS: Fixed `initialDelaySeconds` parameter handling - was previously ignored
+* Android: Fixed NullPointerException when `isInDebugMode` was not properly initialized
+* Fixed inputData type handling across platforms - now properly supports all primitive types and lists
+* iOS: Fixed compilation errors with Map handling
+* iOS: Fixed swapped constraints bug for requiresNetworkConnectivity and requiresExternalPower by @thegriffen (from PR #562)
+* Android: Fixed v2 embedding import in BackgroundWorker by @jogapps (from PR #595)
+
+## Improvements
+* Updated to Flutter 3.32 and flutter_lints 6.0.0
+* Android: Updated target SDK to 35
+* Improved CI/CD with Android emulator caching for faster builds
+* Better error handling and type safety throughout the codebase
+* iOS: Add Privacy Manifest for App Store compliance by @navaronbracke (from PR #555)
+* iOS: Replace print statements with proper os_log for better logging
+* iOS: printScheduledTasks now returns String instead of void by @yarith28 (from PR #585)
+* Android: Fix documentation formatting and typo in BackgroundWorker by @jogapps (from PR #595)
+
+# 0.7.0
+
+* **BREAKING**: Minimum Dart SDK bumped to 3.2.0
+* **BREAKING**: Minimum Flutter SDK bumped to 3.16.0  
+* **BREAKING**: Minimum iOS deployment target bumped to 13.0
+* Android: Update to Android Gradle Plugin 8.10.1
+* Android: Update to Gradle 8.11.1
+* Android: Update Kotlin to 2.1.0
+* Android: Update compile SDK to 35
+* Android: Update target SDK to 35
+* Android: Update NDK to 27.0.12077973
+* Android: Update Java compatibility to version 17
+* iOS: Update Swift version to 5.0
+* Dev dependencies: Update to latest versions (flutter_lints 5.0.0, mockito 5.4.4, etc.)
+* CI: Modernize GitHub Actions workflows with latest action versions
+* CI: Add Flutter caching for faster builds
+* CI: Update test environments (iPhone 15, Android API 34)
+* Fix win32 dependency compatibility issues for Dart 3.8+
+
 # 0.6.0 
 
 * Android: Removed jetifier
@@ -219,7 +299,7 @@
     ```xml
     <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        package="be.tramckrijte.workmanager_example">
+        package="dev.fluttercommunity.workmanager_example">
     
         <!-- io.flutter.app.FlutterApplication is an android.app.Application that
              calls FlutterMain.startInitialization(this); in its onCreate method.

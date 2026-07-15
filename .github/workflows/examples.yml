@@ -11,12 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
-          java-version: 17
+          distribution: 'temurin'
+          java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          cache: true
 
       - name: build
         run: |
@@ -26,14 +28,40 @@ jobs:
 
   example_ios:
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dependency_manager: [cocoapods, spm]
+        include:
+          - dependency_manager: cocoapods
+            build_name: "CocoaPods"
+            flutter_config: "flutter config --no-enable-swift-package-manager"
+            cleanup_step: "echo 'Using CocoaPods - no cleanup needed'"
+          - dependency_manager: spm
+            build_name: "Swift Package Manager"  
+            flutter_config: "flutter config --enable-swift-package-manager"
+            cleanup_step: "cd example/ios && rm -f Podfile Podfile.lock && rm -rf Pods"
+    name: iOS Example (${{ matrix.build_name }})
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          cache: true
 
-      - name: build
+      - name: Configure Flutter for ${{ matrix.build_name }}
+        run: ${{ matrix.flutter_config }}
+
+      - name: Bootstrap project
         run: |
           dart pub global activate melos
           melos bootstrap
-          cd example && flutter build ios --debug --no-codesign
+
+      - name: Cleanup for ${{ matrix.build_name }}
+        run: ${{ matrix.cleanup_step }}
+
+      - name: Build iOS example with ${{ matrix.build_name }}
+        run: |
+          cd example
+          flutter clean
+          flutter build ios --debug --no-codesign

@@ -1,10 +1,27 @@
 name: workmanager
 packages:
   - workmanager
+  - workmanager_platform_interface
+  - workmanager_android
+  - workmanager_apple
   - example
 scripts:
   get: melos exec -- dart pub get
 
+  test:
+    run: melos exec -c 1 --depends-on="flutter_test" -- "flutter test"
+    description: Run tests for all packages with flutter_test dependency.
+
+  generate:
+    run: |
+      melos run generate:pigeon
+      melos run generate:dart
+    description: Generate all code (Pigeon files and Dart mocks/generated files).
+
   generate:dart:
-    run: melos exec -c 1 --depends-on="build_runner" --no-flutter -- "dart run build_runner build --delete-conflicting-outputs"
+    run: melos exec -c 1 --depends-on="build_runner" -- "dart run build_runner build --delete-conflicting-outputs"
     description: Build all generated files for Dart packages in this project.
+
+  generate:pigeon:
+    run: melos exec -c 1 --depends-on="pigeon" -- "dart run pigeon --input pigeons/workmanager_api.dart"
+    description: Generate Pigeon type-safe platform channel code for packages with pigeon dependency.
