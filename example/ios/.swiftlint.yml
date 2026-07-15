@@ -1,6 +1,0 @@
-excluded:
-  - example/ios/Pods
-  - Pods
-included:
-  - .symlinks/plugins/workmanager/ios
-
