@@ -12,9 +12,36 @@ import XCTest
 
 class WorkmanagerTests: XCTestCase {
 
-    // TODO: Add tests for Pigeon-based implementation
-    func testPlaceholder() throws {
-        XCTAssertTrue(true)
+    func testBackgroundTaskCompletionSucceedsForCompletedWork() {
+        XCTAssertTrue(
+            BackgroundTaskCompletion.isSuccessful(
+                result: .newData,
+                isCancelled: false
+            )
+        )
+        XCTAssertTrue(
+            BackgroundTaskCompletion.isSuccessful(
+                result: .noData,
+                isCancelled: false
+            )
+        )
     }
 
+    func testBackgroundTaskCompletionFailsForFailedWork() {
+        XCTAssertFalse(
+            BackgroundTaskCompletion.isSuccessful(
+                result: .failed,
+                isCancelled: false
+            )
+        )
+    }
+
+    func testBackgroundTaskCompletionFailsForExpiredWork() {
+        XCTAssertFalse(
+            BackgroundTaskCompletion.isSuccessful(
+                result: .newData,
+                isCancelled: true
+            )
+        )
+    }
 }

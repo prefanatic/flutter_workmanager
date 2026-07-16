@@ -69,7 +69,7 @@ class BackgroundWorker {
         static let onResultSendCommand = "onResultSend"
     }
 
-    /// The result is discardable due to how [BackgroundTaskOperation] works.
+    /// Reports the Dart callback result to the owning background task.
     @discardableResult
     func performBackgroundRequest(_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void)
         -> Bool {

@@ -7,6 +7,15 @@
 
 import Foundation
 
+enum BackgroundTaskCompletion {
+    static func isSuccessful(
+        result: UIBackgroundFetchResult,
+        isCancelled: Bool
+    ) -> Bool {
+        result != .failed && !isCancelled
+    }
+}
+
 #if os(iOS)
 import Flutter
 #elseif os(macOS)
@@ -21,6 +30,8 @@ class BackgroundTaskOperation: Operation, @unchecked Sendable {
     private let flutterPluginRegistrantCallback: FlutterPluginRegistrantCallback?
     private let inputData: [String: Any]?
     private let backgroundMode: BackgroundMode
+
+    private(set) var result = UIBackgroundFetchResult.failed
 
     init(_ identifier: String,
          inputData: [String: Any]?,
@@ -38,7 +49,8 @@ class BackgroundTaskOperation: Operation, @unchecked Sendable {
                                       inputData: self.inputData,
                                       flutterPluginRegistrantCallback: self.flutterPluginRegistrantCallback)
         DispatchQueue.main.async {
-            worker.performBackgroundRequest { _ in
+            worker.performBackgroundRequest { result in
+                self.result = result
                 semaphore.signal()
             }
         }
